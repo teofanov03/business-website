@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router';
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
+import logo from '../../assets/logo.jpg';
 
 export function Header() {
   const location = useLocation();
@@ -19,9 +20,16 @@ export function Header() {
     <header className="border-b bg-white sticky top-0 z-50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link to="/" className="text-xl font-semibold tracking-tight text-gray-900">
-            YourBusiness
+          {/* Logo + Name */}
+          <Link to="/" className="flex items-center gap-2">
+            <img
+              src={logo}
+              alt="Elevate Business"
+              className="h-16 md:h-20 w-auto object-contain"
+            />
+            <span className="text-xl md:text-2xl font-bold text-gray-900">
+              Elevate Business
+            </span>
           </Link>
 
           {/* Desktop Navigation */}

@@ -10,7 +10,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">YourBusiness</h3>
+            <h3 className="text-lg font-bold text-gray-900">Elevate Business</h3>
             <p className="text-sm text-gray-600 leading-relaxed">
               Professional services for your business growth and success.
             </p>
@@ -58,7 +58,7 @@ export function Footer() {
           <div>
             <h4 className="text-sm font-semibold text-gray-900 mb-4">Connect</h4>
             <p className="text-sm text-gray-600 mb-4 leading-relaxed">
-              contact@yourbusiness.com<br />
+              ElevateBusiness@gmail.com<br />
               +1 (555) 123-4567
             </p>
             <div className="flex gap-4">
@@ -104,7 +104,7 @@ export function Footer() {
 
         <div className="border-t mt-8 pt-8 text-center">
           <p className="text-sm text-gray-600">
-            © {currentYear} YourBusiness. All rights reserved.
+            © {currentYear} Elevate Business. All rights reserved.
           </p>
         </div>
       </div>
