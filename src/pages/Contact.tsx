@@ -8,6 +8,8 @@ import { Mail, Phone, MapPin } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
+import axios from 'axios';
+import { API_URL } from '../api';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -17,11 +19,27 @@ export default function Contact() {
     message: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    toast.success("Message sent successfully! We'll get back to you soon.");
-    setFormData({ name: '', email: '', company: '', message: '' });
+
+    if (loading) return; // sprečava spam klikove
+
+    try {
+      setLoading(true);
+
+      // Slanje na backend
+     await axios.post(`${API_URL}/api/contact`, formData);
+
+      toast.success("Message sent successfully! We'll get back to you soon.");
+      setFormData({ name: '', email: '', company: '', message: '' });
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.response?.data?.message || "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -117,8 +135,13 @@ export default function Contact() {
                 </div>
 
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button type="submit" size="lg" className="w-full bg-blue-600 hover:bg-blue-700">
-                    Send Message
+                  <Button
+                    type="submit"
+                    size="lg"
+                    className={`w-full ${loading ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'}`}
+                    disabled={loading} // dugme disable dok traje request
+                  >
+                    {loading ? "Sending..." : "Send Message"}
                   </Button>
                 </motion.div>
               </form>

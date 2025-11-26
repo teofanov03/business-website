@@ -3,6 +3,7 @@ import { Card, CardContent } from '../components/ui/card';
 import { Users, Award, TrendingUp, Heart } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+
 export default function About() {
   const values = [
     {

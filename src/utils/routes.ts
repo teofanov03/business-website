@@ -4,6 +4,8 @@ import Home from "../pages/Home";
 import About from "../pages/About";
 import Services from "../pages/Services";
 import Contact from "../pages/Contact";
+import Login from "../pages/Login";
+import AdminMessagesRoute from "./AdminMessagesRoute";
 
 export const router = createBrowserRouter([
   {
@@ -14,6 +16,8 @@ export const router = createBrowserRouter([
       { path: "about", Component: About },
       { path: "services", Component: Services },
       { path: "contact", Component: Contact },
+      { path: "login", Component: Login },
+      { path: "admin/messages", Component: AdminMessagesRoute },
     ],
   },
 ]);

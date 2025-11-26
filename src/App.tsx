@@ -1,9 +1,14 @@
+// App.tsx
 import { RouterProvider } from 'react-router';
 import { router } from './utils/routes';
-import ScrollToTop from './components/ScrollToTop';
+import { AuthProvider } from "./utils/AuthContext";
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
+  );
 }
 
 export default App;
