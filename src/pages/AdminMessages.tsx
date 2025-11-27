@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import { Mail, Trash2, Check } from 'lucide-react';
+import { Mail, Trash2, Check, Building2 } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { AuthContext } from '../utils/AuthContext';
@@ -12,9 +12,10 @@ interface Message {
   _id: string;
   name: string;
   email: string;
+  company: string;
   message: string;
   status: 'read' | 'unread';
-  date?: string;
+  createdAt: string;
 }
 
 export default function AdminMessages() {
@@ -22,9 +23,9 @@ export default function AdminMessages() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // GET messages from backend
   useEffect(() => {
     if (!token) return;
-
     setLoading(true);
 
     axios
@@ -38,6 +39,7 @@ export default function AdminMessages() {
       .finally(() => setLoading(false));
   }, [token]);
 
+  // Mark as read
   const handleMarkAsRead = async (_id: string) => {
     try {
       await axios.put(
@@ -45,27 +47,24 @@ export default function AdminMessages() {
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      setMessages((prev) =>
-        prev.map((msg) =>
+      setMessages(
+        messages.map((msg) =>
           msg._id === _id ? { ...msg, status: 'read' } : msg
         )
       );
-
       toast.success('Message marked as read');
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to update message');
     }
   };
 
+  // Delete message
   const handleDelete = async (_id: string) => {
     try {
       await axios.delete(`${API_URL}/api/contact/messages/${_id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      setMessages((prev) => prev.filter((msg) => msg._id !== _id));
-
+      setMessages(messages.filter((msg) => msg._id !== _id));
       toast.success('Message deleted');
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to delete message');
@@ -75,16 +74,18 @@ export default function AdminMessages() {
   const unreadCount = messages.filter((msg) => msg.status === 'unread').length;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
+        {/* Header Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Messages</h1>
           <p className="text-gray-600">
-            {messages.length} total message
-            {messages.length !== 1 ? 's' : ''} • {unreadCount} unread
+            {messages.length} total message{messages.length !== 1 ? 's' : ''} •{' '}
+            {unreadCount} unread
           </p>
         </div>
 
+        {/* Messages List */}
         <div className="space-y-4">
           {loading ? (
             <Card className="text-center py-12">
@@ -111,15 +112,14 @@ export default function AdminMessages() {
               >
                 <CardContent className="p-6">
                   <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                    {/* Message Content */}
                     <div className="flex-1 space-y-3">
                       <div className="flex items-center gap-3 flex-wrap">
                         <h3 className="text-lg font-semibold text-gray-900">
                           {message.name}
                         </h3>
                         <Badge
-                          variant={
-                            message.status === 'unread' ? 'default' : 'secondary'
-                          }
+                          variant={message.status === 'unread' ? 'default' : 'secondary'}
                           className={
                             message.status === 'unread'
                               ? 'bg-[#2563EB] hover:bg-[#1d4ed8]'
@@ -135,9 +135,19 @@ export default function AdminMessages() {
                           <Mail className="h-4 w-4" />
                           {message.email}
                         </p>
-                        {message.date && (
-                          <p className="text-sm text-gray-500">{message.date}</p>
-                        )}
+                        <p className="text-sm text-gray-600 flex items-center gap-2">
+                          <Building2 className="h-4 w-4" />
+                          {message.company || 'N/A'}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {new Date(message.createdAt).toLocaleString('sr-RS', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </p>
                       </div>
 
                       <p className="text-gray-700 leading-relaxed">
@@ -145,6 +155,7 @@ export default function AdminMessages() {
                       </p>
                     </div>
 
+                    {/* Action Buttons */}
                     <div className="flex md:flex-col gap-2 md:min-w-[140px]">
                       {message.status === 'unread' && (
                         <Button
