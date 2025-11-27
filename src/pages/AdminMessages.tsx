@@ -6,10 +6,10 @@ import { Mail, Trash2, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { AuthContext } from '../utils/AuthContext';
-import { API_URL } from '../api'
+import { API_URL } from '../api';
 
 interface Message {
-  id: string;
+  _id: string;
   name: string;
   email: string;
   message: string;
@@ -24,43 +24,55 @@ export default function AdminMessages() {
 
   useEffect(() => {
     if (!token) return;
+
     setLoading(true);
+
     axios
-        .get<Message[]>(`${API_URL}/api/contact/messages`, {
+      .get<Message[]>(`${API_URL}/api/contact/messages`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setMessages(res.data))
-      .catch((err) => toast.error(err.response?.data?.message || 'Failed to load messages'))
+      .catch((err) =>
+        toast.error(err.response?.data?.message || 'Failed to load messages')
+      )
       .finally(() => setLoading(false));
   }, [token]);
 
-  const handleMarkAsRead = async (id: string) => {
+  const handleMarkAsRead = async (_id: string) => {
     try {
       await axios.put(
-        `${API_URL}/api/contact/messages/${id}/read`,
+        `${API_URL}/api/contact/messages/${_id}/read`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setMessages(messages.map(msg => msg.id === id ? { ...msg, status: 'read' } : msg));
+
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg._id === _id ? { ...msg, status: 'read' } : msg
+        )
+      );
+
       toast.success('Message marked as read');
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to update message');
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (_id: string) => {
     try {
-      await axios.delete(`${API_URL}/api/contact/messages/${id}`, {
+      await axios.delete(`${API_URL}/api/contact/messages/${_id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setMessages(messages.filter(msg => msg.id !== id));
+
+      setMessages((prev) => prev.filter((msg) => msg._id !== _id));
+
       toast.success('Message deleted');
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to delete message');
     }
   };
 
-  const unreadCount = messages.filter(msg => msg.status === 'unread').length;
+  const unreadCount = messages.filter((msg) => msg.status === 'unread').length;
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -68,7 +80,8 @@ export default function AdminMessages() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Messages</h1>
           <p className="text-gray-600">
-            {messages.length} total message{messages.length !== 1 ? 's' : ''} • {unreadCount} unread
+            {messages.length} total message
+            {messages.length !== 1 ? 's' : ''} • {unreadCount} unread
           </p>
         </div>
 
@@ -89,7 +102,7 @@ export default function AdminMessages() {
           ) : (
             messages.map((message) => (
               <Card
-                key={message.id}
+                key={message._id}
                 className={`shadow-sm hover:shadow-md transition-shadow ${
                   message.status === 'unread'
                     ? 'bg-yellow-50 border-yellow-200'
@@ -100,9 +113,13 @@ export default function AdminMessages() {
                   <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                     <div className="flex-1 space-y-3">
                       <div className="flex items-center gap-3 flex-wrap">
-                        <h3 className="text-lg font-semibold text-gray-900">{message.name}</h3>
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          {message.name}
+                        </h3>
                         <Badge
-                          variant={message.status === 'unread' ? 'default' : 'secondary'}
+                          variant={
+                            message.status === 'unread' ? 'default' : 'secondary'
+                          }
                           className={
                             message.status === 'unread'
                               ? 'bg-[#2563EB] hover:bg-[#1d4ed8]'
@@ -118,16 +135,20 @@ export default function AdminMessages() {
                           <Mail className="h-4 w-4" />
                           {message.email}
                         </p>
-                        {message.date && <p className="text-sm text-gray-500">{message.date}</p>}
+                        {message.date && (
+                          <p className="text-sm text-gray-500">{message.date}</p>
+                        )}
                       </div>
 
-                      <p className="text-gray-700 leading-relaxed">{message.message}</p>
+                      <p className="text-gray-700 leading-relaxed">
+                        {message.message}
+                      </p>
                     </div>
 
                     <div className="flex md:flex-col gap-2 md:min-w-[140px]">
                       {message.status === 'unread' && (
                         <Button
-                          onClick={() => handleMarkAsRead(message.id)}
+                          onClick={() => handleMarkAsRead(message._id)}
                           variant="outline"
                           className="flex-1 md:flex-none border-[#2563EB] text-[#2563EB] hover:bg-[#2563EB] hover:text-white"
                         >
@@ -136,7 +157,7 @@ export default function AdminMessages() {
                         </Button>
                       )}
                       <Button
-                        onClick={() => handleDelete(message.id)}
+                        onClick={() => handleDelete(message._id)}
                         variant="outline"
                         className="flex-1 md:flex-none border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
                       >
