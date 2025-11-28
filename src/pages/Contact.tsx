@@ -4,7 +4,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
 import { Label } from '../components/ui/label';
-import { Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, Phone, MapPin,Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
@@ -135,14 +135,17 @@ export default function Contact() {
                 </div>
 
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button
-                    type="submit"
-                    size="lg"
-                    className={`w-full ${loading ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'}`}
-                    disabled={loading} // dugme disable dok traje request
-                  >
-                    {loading ? "Sending..." : "Send Message"}
-                  </Button>
+                 <Button
+                  type="submit"
+                  size="lg"
+                  className={`w-full flex items-center justify-center ${
+                    loading ? '!bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+                  }`}
+                  disabled={loading}
+                >
+                  {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+                  {loading ? "Sending..." : "Send Message"}
+                </Button>
                 </motion.div>
               </form>
             </motion.div>
