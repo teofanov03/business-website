@@ -2,11 +2,12 @@ import { useState, useEffect, useContext } from 'react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import { Mail, Trash2, Check, Building2 } from 'lucide-react';
+import { Mail, Trash2, Check, Building2, LogOut } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { AuthContext } from '../utils/AuthContext';
 import { API_URL } from '../api';
+import { useNavigate } from 'react-router-dom';
 
 interface Message {
   _id: string;
@@ -19,9 +20,18 @@ interface Message {
 }
 
 export default function AdminMessages() {
-  const { token } = useContext(AuthContext);
+  const { token, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // --- LOGOUT HANDLER ---
+  const handleLogout = () => {
+    logout();                   // briše token
+    toast.success("Logged out");
+    navigate("/login");         // preusmerava na login
+  };
 
   // GET messages from backend
   useEffect(() => {
@@ -76,13 +86,25 @@ export default function AdminMessages() {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
+
         {/* Header Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Messages</h1>
-          <p className="text-gray-600">
-            {messages.length} total message{messages.length !== 1 ? 's' : ''} •{' '}
-            {unreadCount} unread
-          </p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Messages</h1>
+            <p className="text-gray-600">
+              {messages.length} total message{messages.length !== 1 ? 's' : ''} • {unreadCount} unread
+            </p>
+          </div>
+
+          {/* --- LOGOUT BUTTON --- */}
+          <Button
+            onClick={handleLogout}
+            variant="outline"
+            className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white cursor-pointer"
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Logout
+          </Button>
         </div>
 
         {/* Messages List */}
@@ -112,6 +134,7 @@ export default function AdminMessages() {
               >
                 <CardContent className="p-6">
                   <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                    
                     {/* Message Content */}
                     <div className="flex-1 space-y-3">
                       <div className="flex items-center gap-3 flex-wrap">
@@ -161,27 +184,30 @@ export default function AdminMessages() {
                         <Button
                           onClick={() => handleMarkAsRead(message._id)}
                           variant="outline"
-                          className="flex-1 md:flex-none border-[#2563EB] text-[#2563EB] hover:bg-[#2563EB] hover:text-white"
+                          className="flex-1 md:flex-none border-[#2563EB] text-[#2563EB] hover:bg-[#2563EB] hover:text-white "
                         >
                           <Check className="h-4 w-4 mr-2" />
                           Mark as Read
                         </Button>
                       )}
+
                       <Button
                         onClick={() => handleDelete(message._id)}
                         variant="outline"
-                        className="flex-1 md:flex-none border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                        className="flex-1 md:flex-none border-red-500 text-red-500 hover:bg-red-500 hover:text-white "
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
                         Delete
                       </Button>
                     </div>
+
                   </div>
                 </CardContent>
               </Card>
             ))
           )}
         </div>
+
       </div>
     </div>
   );
