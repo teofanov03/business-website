@@ -3,7 +3,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { AuthContext } from '../utils/AuthContext';
@@ -32,24 +32,29 @@ export default function Login() {
     }
 
     try {
-      setLoading(true);
+  setLoading(true);
+  // console.log("➡ Pokusavam login...");
 
-      // Poziv backend-a
-      const response = await axios.post<LoginResponse>(
-        `${API_URL}/api/auth/login`,
-        {
-          username: formData.username,
-          password: formData.password,
-        }
-      );
+  const response = await axios.post<LoginResponse>(
+    `${API_URL}/api/auth/login`,
+    {
+      username: formData.username,
+      password: formData.password,
+    }
+  );
 
-     
-        login(response.data.token);
-        console.log("Token after login:", localStorage.getItem("token"));
-        navigate("/admin/messages");
+  // console.log("➡ Login response:", response.data);
+
+  login(response.data.token);
+  // console.log("➡ Token posle login():", localStorage.getItem("token"));
+
+  setTimeout(() => {
+    navigate("/admin/messages", { replace: true });
+  }, 50);
     } catch (err: any) {
-      console.error(err);
-      toast.error(err.response?.data?.message || 'Login failed');
+  console.error("❌ Login error:", err);
+  toast.error(err.response?.data?.message || "Login failed");
+
     } finally {
       setLoading(false);
     }
